@@ -1,25 +1,19 @@
 -- Benjamin Fichet
 -- 2018 - 04 - 08 - 03:38pm / drunk
--- Because skinning must be an elegant task!
+-- Because skinning should be an elegant task!
 ---------------------------------------------------------
-struct SknAbsWMT_Cursor (
-	fn init = (
-		
-	),
-	on create do ()
-)
 
-
-
+/* Class: SkinAbsWeightMToolController */
 struct SkinAbsWeightMToolController (
 
-	default_multiplier =  0.001,
-	node               = undefined,
-	sknmod             = undefined,
-	cursorBasePos      = undefined,
-	selectedVerts      = undefined,
-	selectedBone       = undefined,
-	_vertexBoneid      = undefined,
+	default_multiplier = 0.001,     -- the default multiplier (mousePosition/Weights)
+	node               = undefined, -- selected node
+	sknmod             = undefined, -- selected skin
+	cursorBasePos      = undefined, -- used internally to calculate weights changes
+	selectedVerts      = undefined, -- vertices to work with
+	selectedBone       = undefined, -- bone to work with
+
+	_vertexBoneid      = undefined, -- prob. unused
 
 
 	fn init viewPoint:[0,0] = (
@@ -64,13 +58,13 @@ struct SkinAbsWeightMToolController (
 			)
 
 			local mvt_2d = (this.cursorBasePos - viewPoint)*this.default_multiplier
-			local mvt_1d = base_weight + ((((mvt_2d.x*-1) + mvt_2d.y)*0.5))
+			local mvt_1d = base_weight + ((mvt_2d.x*-1)*0.5)
 			
 			-- Cap movements at 0 weight
 			if mvt_1d < 0 then (this.cursorBasePos = viewPoint)
 
 			skinOps.SetVertexWeights this.sknmod i this.selectedBone mvt_1d --(oWeight)
-			format "Set vertex: (%) weight: (%)\n" (i as string) (mvt_1d as string)
+			--format "Set vertex: (%) weight: (%)\n" (i as string) (mvt_1d as string)
 		)
 	),
 
@@ -78,6 +72,10 @@ struct SkinAbsWeightMToolController (
 )
 
 
+/* 
+Tool: SkinAbsWeightMTool 
+	Skin Absolute Weight Mouse Tool
+*/
 tool SkinAbsWeightMTool (
 
 	local tool_controller  = undefined
@@ -94,5 +92,4 @@ tool SkinAbsWeightMTool (
 		if click == 2 then (tool_controller.moveEvent ctrlKey:ctrlKey altKey:altKey shiftKey:shiftKey viewPoint:viewPoint)
 	)
 )
-
 startTool SkinAbsWeightMTool
