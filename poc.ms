@@ -60,7 +60,7 @@ struct SkinAbsWeightMToolController (
 			local mvt_2d = (this.cursorBasePos - viewPoint)*this.default_multiplier
 			local mvt_1d = base_weight + ((mvt_2d.x*-1)*0.5)
 			
-			-- Cap movements at 0 weight
+			-- Cap movements at > 0
 			if mvt_1d < 0 then (this.cursorBasePos = viewPoint)
 
 			skinOps.SetVertexWeights this.sknmod i this.selectedBone mvt_1d --(oWeight)
@@ -92,4 +92,10 @@ tool SkinAbsWeightMTool (
 		if click == 2 then (tool_controller.moveEvent ctrlKey:ctrlKey altKey:altKey shiftKey:shiftKey viewPoint:viewPoint)
 	)
 )
-startTool SkinAbsWeightMTool
+--startTool SkinAbsWeightMTool
+
+
+
+macroScript macro_SkinAbsWeightMTool category:"Benjamin Fichet" autoUndoEnabled:true (
+	startTool SkinAbsWeightMTool
+)
