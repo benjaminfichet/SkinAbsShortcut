@@ -18,6 +18,8 @@ struct SkinAbsWeightManipBackend (
 	cursorBasePos      = undefined,
 	selectedVerts      = undefined,
 	selectedBone       = undefined,
+	_vertexBoneid      = undefined,
+
 
 	fn init viewPoint:[0,0] = (
 		local ret = false
@@ -26,13 +28,13 @@ struct SkinAbsWeightManipBackend (
 
 			if (classof(selectedMod) == Skin) then (
 
-				this.node           = selection[1]
-				this.sknmod         = selectedMod
+				this.node           = selection[1] -- safe, selection[1] is obviously defined if modPanel.getCurrentObject() is defined
+				this.sknmod         = selectedMod  -- base data..
 				this.cursorBasePos  = viewPoint
 
-				-- Get selected vertex
-				this.selectedVerts  = #()
-				for i=1 to this.node.numverts do (if (skinOps.IsVertexSelected this.sknmod i) then (append this.selectedVerts i))
+				-- Get-store selected vertices
+				this.selectedVerts  = for i=1 to this.node.numverts where (skinOps.IsVertexSelected this.sknmod i) collect i
+				--break()
 
 				-- Get selected bone
 				this.selectedBone = skinOps.GetSelectedBone this.sknmod
@@ -53,7 +55,8 @@ struct SkinAbsWeightManipBackend (
 		for i in this.selectedVerts do (
 			local base_weight = 0
 			
-			if shiftKey then ( -- use the base weight as starting point
+			if shiftKey and (_vertexBoneid == undefined) then ( -- use the base weight as starting point
+				-- find vertex's bone id
 				local theb = undefined
 				local vertex_bone_count = skinOps.GetVertexWeightCount this.sknmod i
 				for bn = 1 to vertex_bone_count where ((skinOps.GetVertexWeightBoneID this.sknmod i bn) == this.selectedBone) do (base_weight  = skinops.getvertexweight this.sknmod i bn)
@@ -63,7 +66,7 @@ struct SkinAbsWeightManipBackend (
 			local mvt_1d = base_weight + ((((mvt_2d.x*-1) + mvt_2d.y)*0.5))
 
 			skinOps.SetVertexWeights this.sknmod i this.selectedBone mvt_1d --(oWeight)
-			skinOps.SetVertexWeights this.sknmod i this.selectedBone mvt_1d --(oWeight)
+			--skinOps.SetVertexWeights this.sknmod i this.selectedBone mvt_1d --(oWeight)
 		)
 	),
 
