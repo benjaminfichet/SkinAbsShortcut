@@ -2,15 +2,16 @@
 -- 2018 - 04 - 08 - 03:38pm / drunk
 -- Because skinning must be an elegant task!
 ---------------------------------------------------------
-struct HandySkinManipulator (
-
+struct SknAbsWMT_Cursor (
+	fn init = (
+		
+	),
 	on create do ()
 )
 
 
 
-
-struct SkinAbsWeightManipBackend (
+struct SkinAbsWeightMToolController (
 
 	default_multiplier =  0.001,
 	node               = undefined,
@@ -55,7 +56,7 @@ struct SkinAbsWeightManipBackend (
 		for i in this.selectedVerts do (
 			local base_weight = 0
 			
-			if shiftKey and (_vertexBoneid == undefined) then ( -- use the base weight as starting point
+			if (not shiftKey) then ( -- use the base weight as starting point
 				-- find vertex's bone id
 				local theb = undefined
 				local vertex_bone_count = skinOps.GetVertexWeightCount this.sknmod i
@@ -64,30 +65,34 @@ struct SkinAbsWeightManipBackend (
 
 			local mvt_2d = (this.cursorBasePos - viewPoint)*this.default_multiplier
 			local mvt_1d = base_weight + ((((mvt_2d.x*-1) + mvt_2d.y)*0.5))
+			
+			-- Cap movements at 0 weight
+			if mvt_1d < 0 then (this.cursorBasePos = viewPoint)
 
 			skinOps.SetVertexWeights this.sknmod i this.selectedBone mvt_1d --(oWeight)
-			--skinOps.SetVertexWeights this.sknmod i this.selectedBone mvt_1d --(oWeight)
+			format "Set vertex: (%) weight: (%)\n" (i as string) (mvt_1d as string)
 		)
 	),
-
 
 	on create do ()
 )
 
 
-tool SkinAbsWeightManip (
-	local backend  = undefined
+tool SkinAbsWeightMTool (
 
+	local tool_controller  = undefined
 	on mousePoint click do --coordsys grid
 	(
 		if click == 1 then (
-			backend = SkinAbsWeightManipBackend()
-			if (not backend.init viewPoint:viewPoint) then (throw "Unable to initialize SkinAbsWeightManipBackend")
+			tool_controller = SkinAbsWeightMToolController()
+			if (not tool_controller.init viewPoint:viewPoint) then (throw "Unable to initialize SkinAbsWeightMToolController")
 		)
 		if click == 3 then #stop
 	)
 	on mouseMove click do
 	(
-		if click == 2 then (backend.moveEvent ctrlKey:ctrlKey altKey:altKey shiftKey:shiftKey viewPoint:viewPoint)
+		if click == 2 then (tool_controller.moveEvent ctrlKey:ctrlKey altKey:altKey shiftKey:shiftKey viewPoint:viewPoint)
 	)
 )
+
+startTool SkinAbsWeightMTool
